@@ -1,13 +1,19 @@
 from app import create_app, db
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import os
 from your_database_module import check_db_connection
+from config import Config
 
+
+# Initialize the database and JWT manager
+db = SQLAlchemy()
+jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
+    
     # Load configuration from environment variables
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
@@ -19,7 +25,6 @@ def create_app():
     # Create all database tables
     with app.app_context():
         db.create_all()
-
 
     return app
 
