@@ -6,16 +6,6 @@ from app.models import Product, CartItem
 
 main_routes = Blueprint('main_routes', __name__)
 
-class Product(db.Model):
-    __tablename__ = 'product'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    image_url = db.Column(db.String, nullable=False)
-    category = db.Column(db.String, nullable=False)
-
 @main_routes.route('/', methods=['GET'])
 def index():
     return jsonify({"message": "Welcome to ShopEase API!"}), 200
