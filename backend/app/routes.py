@@ -8,8 +8,13 @@ main_routes = Blueprint('main_routes', __name__)
 # Get products route
 @main_routes.route('/products', methods=['GET'])
 def get_products():
-    products = Product.query.all()
-    product_list = [{"id": p.id, "name": p.name, "description": p.description, "price": p.price, "image_url": p.image_url} for p in products]
+    category = request.args.get('category')  # Get category from query params
+    if category:
+        products = Product.query.filter_by(category=category).all()
+    else:
+        products = Product.query.all()
+
+    product_list = [{"id": p.id, "name": p.name, "description": p.description, "price": p.price, "image_url": p.image_url, "category": p.category} for p in products]
     return jsonify(product_list), 200
 
 # Add product route (admin only)
@@ -32,28 +37,15 @@ def add_product():
     db.session.commit()
     return jsonify({"message": "Product added successfully"}), 201
 
-# Get products by category route
-@main_routes.route('/products', methods=['GET'])
-def get_products():
-    category = request.args.get('category')  # Get category from query params
-    if category:
-        products = Product.query.filter_by(category=category).all()
-    else:
-        products = Product.query.all()
-
-    product_list = [{"id": p.id, "name": p.name, "description": p.description, "price": p.price, "image_url": p.image_url, "category": p.category} for p in products]
-    return jsonify(product_list), 200
-
-
 # Add to cart route
 @main_routes.route('/cart', methods=['POST'])
 @jwt_required()
 def add_to_cart():
     user_identity = get_jwt_identity()
     data = request.json
-    new_cart_item = CartItem(user_id=user_identity['id'], product_id=data['product_id'], quantity=data['quantity'])
+    # Ensure the user_id is retrieved correctly from the JWT identity
+    user_id = user_identity['email']  # Change this if you include ID in JWT
+    new_cart_item = CartItem(user_id=user_id, product_id=data['product_id'], quantity=data['quantity'])
     db.session.add(new_cart_item)
     db.session.commit()
     return jsonify({"message": "Item added to cart"}), 201
-
-
