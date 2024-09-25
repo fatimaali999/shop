@@ -5,9 +5,11 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from config import Config
 
+# Initialize extensions
 db = SQLAlchemy()
 jwt = JWTManager()
 migrate = Migrate()  # Initialize Flask-Migrate
+
 
 def create_app():
     app = Flask(__name__)
@@ -20,7 +22,9 @@ def create_app():
     CORS(app)  # Enable Cross-Origin Resource Sharing
 
     # Import and register your blueprints
-    from app.routes import main_routes
+    from app.routes.main_routes import main_routes
+    from app.routes.user import user_routes
     app.register_blueprint(main_routes)
+    app.register_blueprint(user_routes)
 
     return app
