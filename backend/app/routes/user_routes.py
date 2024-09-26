@@ -2,13 +2,15 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
-from app.models.user import User
+from app.models import User
+
 
 user_routes = Blueprint('user_routes', __name__)
 
 # User Signup
 @user_routes.route('/signup', methods=['POST'])
 def signup():
+    from app.models import User
     data = request.json
     
     # Check if email is already registered
