@@ -4,6 +4,7 @@ import CheckoutForm from './Checkout'; // Import the CheckoutForm
 import '../assets/Checkout.css'; // Optional: for styling
 
 const Checkout = () => {
+    const stripeApiKey = process.env.REACT_APP_STRIPE_API_KEY;
     const navigate = useNavigate();
 
     // Dummy data for cart items
