@@ -6,15 +6,6 @@ from app.models import Product, CartItem
 
 main_routes = Blueprint('main_routes', __name__)
 
-class Product(db.Model):
-    __tablename__ = 'product'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    image_url = db.Column(db.String, nullable=False)
-    category = db.Column(db.String, nullable=False)
 
 @main_routes.route('/', methods=['GET'])
 def index():
@@ -23,7 +14,7 @@ def index():
 # Get products route
 @main_routes.route('/products', methods=['GET'])
 def get_products():
-    category = request.args.get('category')  # Get category from query params
+    category = request.args.get('category')
     if category:
         products = Product.query.filter_by(category=category).all()
     else:
@@ -46,7 +37,7 @@ def add_product():
         description=data['description'],
         price=data['price'],
         image_url=data.get('image_url'),
-        category=data['category']  # Ensure to include category
+        category=data['category']
     )
     db.session.add(new_product)
     db.session.commit()
@@ -58,8 +49,7 @@ def add_product():
 def add_to_cart():
     user_identity = get_jwt_identity()
     data = request.json
-    # Ensure the user_id is retrieved correctly from the JWT identity
-    user_id = user_identity['email']  # Change this if you include ID in JWT
+    user_id = user_identity['email']
     new_cart_item = CartItem(user_id=user_id, product_id=data['product_id'], quantity=data['quantity'])
     db.session.add(new_cart_item)
     db.session.commit()
