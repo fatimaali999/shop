@@ -1,14 +1,19 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token,  jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from app.models import User
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 user_routes = Blueprint('user_routes', __name__)
 
 # User Signup
 @user_routes.route('/signup', methods=['POST'])
 def signup():
+    logging.debug(f"Received data: {data}")
+
     data = request.json
     
     # Check if email is already registered
@@ -19,7 +24,7 @@ def signup():
     if data['password'] != data['confirm_password']:
         return jsonify({"message": "Passwords do not match."}), 400
 
-    hashed_password = generate_password_hash(data['password'], method='sha256')
+    hashed_password = generate_password_hash(data['password'])
     new_user = User(
         email=data['email'],
         name=data['name'],
@@ -39,3 +44,10 @@ def login():
         access_token = create_access_token(identity={'id': user.id, 'email': user.email, 'is_admin': user.is_admin})
         return jsonify(access_token=access_token), 200
     return jsonify({"message": "Invalid credentials."}), 401
+
+# Protected Route
+@user_routes.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200

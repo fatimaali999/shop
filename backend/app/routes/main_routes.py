@@ -49,7 +49,7 @@ def add_product():
 def add_to_cart():
     user_identity = get_jwt_identity()
     data = request.json
-    user_id = user_identity['email']
+    user_id = user_identity['id']
     new_cart_item = CartItem(user_id=user_id, product_id=data['product_id'], quantity=data['quantity'])
     db.session.add(new_cart_item)
     db.session.commit()
