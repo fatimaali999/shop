@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
-from app.models import Product, CartItem
+from app.models import Product, CartItem, Category
 
 
 main_routes = Blueprint('main_routes', __name__)
@@ -54,3 +54,30 @@ def add_to_cart():
     db.session.add(new_cart_item)
     db.session.commit()
     return jsonify({"message": "Item added to cart"}), 201
+
+# Route to add categories (admin only)
+@main_routes.route('/admin/categories', methods=['POST'])
+@jwt_required()
+def add_categories():
+    user_identity = get_jwt_identity()
+    if not user_identity['is_admin']:
+        return jsonify({"message": "Access denied. Admins only."}), 403
+
+    # add categories
+    categories = ['home & gifts', 'beauty & health', 'jewellery & accessories', 'handbags', 'shoes', "women's clothing"]
+
+    for category_name in categories:
+        # Check if the category already exists
+        if not Category.query.filter_by(name=category_name).first():
+            category = Category(name=category_name)
+            db.session.add(category)
+
+    db.session.commit()
+    return jsonify({"message": "Categories added!"}), 201
+
+# New route to get categories
+@main_routes.route('/categories', methods=['GET'])
+def get_categories():
+    categories = Category.query.all()
+    category_list = [{"id": c.id, "name": c.name} for c in categories]
+    return jsonify(category_list), 200
