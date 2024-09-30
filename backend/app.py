@@ -17,7 +17,8 @@ def create_app():
      app.register_blueprint(checkout_routes)
      
      # Load configuration from environment variables
-     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL,' 'postgresql://myuser:password@localhost:5432/shopease_db
+')
      app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
      app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
      app.config['STRIPE_SECRET_KEY'] = os.getenv('STRIPE_SECRET_KEY')
