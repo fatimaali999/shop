@@ -15,16 +15,30 @@ def signup():
     data = request.json
 
     logging.debug(f"Received data: {data}")
+
+     # Check if data is provided
+    if not data:
+        return jsonify({"message": "No data provided."}), 400
+
+    # Check if required fields are present
+    required_fields = ['email', 'password', 'confirm_password', 'name', 'surname']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"message": f"{field.capitalize()} is required."}), 400
     
     # Check if email is already registered
     if User.query.filter_by(email=data['email']).first():
+        logging.debug(f"Email already registered: {data['email']}")
         return jsonify({"message": "Email already registered."}), 400
 
     # Check if passwords match
     if data['password'] != data['confirm_password']:
+        logging.debug("Passwords do not match.")
         return jsonify({"message": "Passwords do not match."}), 400
 
     hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
+
+    # Create new user
     new_user = User(
         email=data['email'],
         name=data['name'],
@@ -33,6 +47,7 @@ def signup():
     )
     db.session.add(new_user)
     db.session.commit()
+    logging.debug(f"User signed up successfully: {new_user.email}")
     return jsonify({"message": "User signed up successfully."}), 201
 
 # User Login
@@ -53,7 +68,7 @@ def login():
         if user:
             logging.debug(f"User found: {user.email}")
             # Check if the password matches the hashed password
-            if check_password_hash(user.password, data['password'], method='pbkdf2:sha256'):
+            if check_password_hash(user.password, data['password']):
                 access_token = create_access_token(identity={'id': user.id, 'email': user.email, 'is_admin': user.is_admin})
                 return jsonify(access_token=access_token), 200
             else:

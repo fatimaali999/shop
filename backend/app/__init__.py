@@ -22,8 +22,10 @@ def create_app():
 
     from app.routes.main_routes import main_routes
     from app.routes.user import user_routes
+    from app.routes.checkout import checkout_routes
 
     app.register_blueprint(main_routes)
     app.register_blueprint(user_routes)
+    app.register_blueprint(checkout_routes)
 
     return app
