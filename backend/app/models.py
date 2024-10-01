@@ -1,13 +1,6 @@
 from app import db
 from datetime import datetime
 
-class Category(db.Model):
-    __tablename__ = 'category'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-
-    products = db.relationship('Product', backref='category', lazy=True)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,8 +22,8 @@ class Product(db.Model):
     description = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(255))
-    
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
