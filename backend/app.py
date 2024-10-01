@@ -1,39 +1,42 @@
-from app import create_app, db
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 import os
-from app.checkout import checkout_routes
 from dotenv import load_dotenv
+from app.checkout import checkout_routes
 from config import Config
 
+# Load environment variables
 load_dotenv()
+
+# Initialize the extensions
+db = SQLAlchemy()
+jwt = JWTManager()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
-    
 
-     # Register the blueprint
-     app.register_blueprint(checkout_routes)
-     
-     # Load configuration from environment variables
-     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL,' 'postgresql://myuser:password@localhost:5432/shopease_db
-')
-     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-     app.config['STRIPE_SECRET_KEY'] = os.getenv('STRIPE_SECRET_KEY')
-     
-     
-     # Initialize the database and JWT manager
-     db = SQLAlchemy(app)
-     jwt = JWTManager(app)i
-     migrate = Migrate(app, db)
+    # Register the blueprint
+    app.register_blueprint(checkout_routes)
 
-     return app
-     
+    # Load configuration from environment variables
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://myuser:password@localhost:5432/shopease_db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+    app.config['STRIPE_SECRET_KEY'] = os.getenv('STRIPE_SECRET_KEY')
 
-     app = create_app()
-     
+    # Initialize extensions with the app
+    db.init_app(app)
+    jwt.init_app(app)
+    migrate.init_app(app, db)
 
-     if __name__ == '__main__':
-         app.run(debug=True)
+    return app
+
+# Initialize the app
+app = create_app()
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
