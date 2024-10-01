@@ -9,7 +9,7 @@ main_routes = Blueprint('main_routes', __name__)
 
 @main_routes.route('/', methods=['GET'])
 def index():
-    return jsonify({"Welcome to ShopEasei! Happy shopping!"}), 200
+    return jsonify({"message":"Welcome to ShopEase!"}), 200
 
 # Get products route
 @main_routes.route('/products', methods=['GET'])
@@ -20,7 +20,18 @@ def get_products():
     else:
         products = Product.query.all()
 
-    product_list = [{"id": p.id, "name": p.name, "description": p.description, "price": p.price, "image_url": p.image_url, "category": p.category} for p in products]
+    product_list = []
+    for p in products:
+        product_info = {
+            "id": p.id,
+            "name": p.name,
+            "description": p.description,
+            "price": p.price,
+            "image_url": p.image_url,
+            "category": p.category
+        }
+        product_list.append(product_info)
+
     return jsonify(product_list), 200
 
 # Add product route (admin only)
