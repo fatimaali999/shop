@@ -16,22 +16,31 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Use the latest version
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4  # Use the latest version
         with:
           python-version: '3.9'
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           cd backend  # Change to your backend directory
-          pip install -r requirements.txt
+          pip install --cache-dir .cache/pip -r requirements.txt  # Use the cache directory
 
       - name: Run tests
         run: |
           cd backend  # Change to your backend directory
           pytest  # Adjust this command if you're using a different testing framework
+        continue-on-error: false  # Ensure the job fails if tests fail
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
